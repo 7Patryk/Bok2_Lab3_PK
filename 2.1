@@ -2,23 +2,14 @@
 #include <cstring>
 #include <iostream>
 
-enum class TypTowaru { ciekly, sypki, paczkowany };
-
 // Klasa bazowa Pojazd
 class Pojazd {
 protected:
     char m_numerRej[9];
-    double m_predkosc;
 
 public:
     void setNumerRej(const char* i_num) { strncpy(m_numerRej, i_num, 8); }
     const char* getNumerRej() { return m_numerRej; }
-    double getPredkosc() { return m_predkosc; }
-
-    Pojazd(double i_pred, const char* i_num) {
-        setNumerRej(i_num);
-        m_predkosc = i_pred;
-    }
 
     virtual double oplataRejestracyjna() const {
         return 0;
@@ -32,21 +23,16 @@ class SamochodOsobowy : public Pojazd {
 private:
     int m_liczbaPasazerow;
 
-    void setPredkosc(double i_pred) { m_predkosc = (i_pred > 160) ? i_pred : 160; }
-    void setLiczbaPasazerow(int i_lp) { m_liczbaPasazerow = (i_lp > 1) ? i_lp : 1; }
-
 public:
     int getLiczbaPasazerow() { return m_liczbaPasazerow; }
 
-    SamochodOsobowy(double i_pred, int i_lp, const char* i_num)
-        : Pojazd(i_pred, i_num) {
-        setPredkosc(i_pred);
-        setLiczbaPasazerow(i_lp);
+    SamochodOsobowy(int i_lp, const char* i_num)
+        : m_liczbaPasazerow(i_lp) {
+        setNumerRej(i_num);
     }
 
     double oplataRejestracyjna() const override {
-        double nadmiarowaPredkosc = (m_predkosc > 140) ? m_predkosc - 140 : 0;
-        return 500 + 50 * m_liczbaPasazerow + 5 * nadmiarowaPredkosc;
+        return 500 + 50 * m_liczbaPasazerow;
     }
 };
 
@@ -56,17 +42,10 @@ private:
     double m_pojemnosc;
     TypTowaru m_typ;
 
-    void setPredkosc(double i_pred) { m_predkosc = (i_pred > 90) ? 90 : i_pred; }
-    void setPojemnosc(double i_poj) { m_pojemnosc = (i_poj > 1000) ? i_poj : 1000; }
-
 public:
-    TypTowaru getTyp() { return m_typ; }
-    double getPojemnosc() { return m_pojemnosc; }
-
-    SamochodCiezarowy(double i_pred, double i_poj, TypTowaru i_typ, const char* i_num)
-        : Pojazd(i_pred, i_num), m_typ(i_typ) {
-        setPredkosc(i_pred);
-        setPojemnosc(i_poj);
+    SamochodCiezarowy(double i_poj, TypTowaru i_typ, const char* i_num)
+        : m_pojemnosc(i_poj), m_typ(i_typ) {
+        setNumerRej(i_num);
     }
 
     double oplataRejestracyjna() const override {
@@ -80,28 +59,30 @@ public:
     }
 };
 
+
+
 #include "klasy.h"
 
 int main() {
     // Przykłady użycia klas
-    SamochodOsobowy osobowy(150, 4, "XYZ1234");
-    SamochodCiezarowy ciezarowy(100, 2000, TypTowaru::ciekly, "ABC5678");
+    SamochodOsobowy osobowy(4, "XYZ1234");
+    SamochodCiezarowy ciezarowy(2000, TypTowaru::ciekly, "ABC5678");
 
     std::cout << "Samochod osobowy:" << std::endl;
     std::cout << "Numer rej: " << osobowy.getNumerRej() << std::endl;
-    std::cout << "Predkosc: " << osobowy.getPredkosc() << std::endl;
     std::cout << "Liczba pasazerow: " << osobowy.getLiczbaPasazerow() << std::endl;
     std::cout << "Oplata rejestracyjna: " << osobowy.oplataRejestracyjna() << std::endl;
 
     std::cout << "\nSamochod ciezarowy:" << std::endl;
     std::cout << "Numer rej: " << ciezarowy.getNumerRej() << std::endl;
-    std::cout << "Predkosc: " << ciezarowy.getPredkosc() << std::endl;
     std::cout << "Pojemnosc: " << ciezarowy.getPojemnosc() << std::endl;
     std::cout << "Typ towaru: " << static_cast<int>(ciezarowy.getTyp()) << std::endl;
     std::cout << "Oplata rejestracyjna: " << ciezarowy.oplataRejestracyjna() << std::endl;
 
     return 0;
 }
+
+
 
 
 
