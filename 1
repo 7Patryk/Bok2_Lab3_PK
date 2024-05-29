@@ -171,3 +171,144 @@ int main() {
 
     return 0;
 }
+
+
+
+
+
+
+
+#include <iostream>
+#include <cmath>
+#include <vector>
+
+using namespace std;
+
+class Figura {
+protected:
+    struct Polozenie {
+        double x, y;
+    } m_polozenie;
+
+public:
+    void setPolozenie(double x, double y) {
+        m_polozenie.x = x;
+        m_polozenie.y = y;
+    }
+
+    double getPolozenieX() const { return m_polozenie.x; }
+    double getPolozenieY() const { return m_polozenie.y; }
+
+    virtual double polePowierzchni() const = 0;
+    virtual double obwod() const = 0;
+
+    virtual ~Figura() = default;
+};
+
+class Kolo : public Figura {
+private:
+    double m_promien;
+
+public:
+    Kolo(double x, double y, double promien) : m_promien(promien) {
+        setPolozenie(x, y);
+    }
+
+    double polePowierzchni() const override {
+        return M_PI * m_promien * m_promien;
+    }
+
+    double obwod() const override {
+        return 2 * M_PI * m_promien;
+    }
+};
+
+class Prostokat : public Figura {
+private:
+    double m_dluzszyBok;
+    double m_krotszyBok;
+
+public:
+    Prostokat(double x, double y, double dluzszyBok, double krotszyBok)
+        : m_dluzszyBok(dluzszyBok), m_krotszyBok(krotszyBok) {
+        setPolozenie(x, y);
+    }
+
+    double polePowierzchni() const override {
+        return m_dluzszyBok * m_krotszyBok;
+    }
+
+    double obwod() const override {
+        return 2 * (m_dluzszyBok + m_krotszyBok);
+    }
+};
+
+class Trojkat : public Figura {
+private:
+    double m_bokA;
+    double m_bokB;
+    double m_bokC;
+
+public:
+    Trojkat(double x, double y, double bokA, double bokB, double bokC)
+        : m_bokA(bokA), m_bokB(bokB), m_bokC(bokC) {
+        setPolozenie(x, y);
+    }
+
+    double polePowierzchni() const override {
+        double p = (m_bokA + m_bokB + m_bokC) / 2;
+        return sqrt(p * (p - m_bokA) * (p - m_bokB) * (p - m_bokC));
+    }
+
+    double obwod() const override {
+        return m_bokA + m_bokB + m_bokC;
+    }
+};
+
+class Kwadrat : public Prostokat {
+public:
+    Kwadrat(double x, double y, double bok)
+        : Prostokat(x, y, bok, bok) {}
+};
+
+class LicznikFigur {
+private:
+    static int m_licznik;
+
+public:
+    LicznikFigur() { m_licznik++; }
+    ~LicznikFigur() { m_licznik--; }
+
+    static int getLiczbaFigur() { return m_licznik; }
+};
+
+int LicznikFigur::m_licznik = 0;
+
+int main() {
+    vector<Figura*> figury;
+
+    // Tworzenie i dodawanie figur do wektora
+    figury.push_back(new Kolo(0, 0, 5));
+    figury.push_back(new Prostokat(0, 0, 4, 6));
+    figury.push_back(new Trojkat(0, 0, 3, 4, 5));
+    figury.push_back(new Kwadrat(0, 0, 5));
+
+    // Obliczanie sumy pól powierzchni wszystkich figur
+    double sumaPol = 0.0;
+    for (const auto& figura : figury) {
+        sumaPol += figura->polePowierzchni();
+    }
+
+    // Wypisanie sumy pól powierzchni i liczby wszystkich figur
+    cout << "Sumaryczne pole powierzchni wszystkich figur: " << sumaPol << endl;
+    cout << "Liczba wszystkich figur: " << LicznikFigur::getLiczbaFigur() << endl;
+
+    // Zwolnienie pamięci zaalokowanej dla figur
+    for (const auto& figura : figury) {
+        delete figura;
+    }
+
+    return 0;
+}
+
+
