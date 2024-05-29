@@ -1,310 +1,35 @@
-Dla klas SamochodOsobowy i SamochodCiezarowy z pliku „klasy.h” wydziel klasę
-bazową Pojazd, która zawierać będzie wszystkie wspólne informacje dla obu klas.
-W tym celu napisz nową klasę i skopiuj do niej pola wspólne wraz z geterami i seterami. W klasach SamochodOsobowy i SamochodCiezarowy dodaj dziedziczenie po klasie Pojazd i usuń z nich skopiowane składniki – są one teraz dziedziczone.
-Bardzo ważne jest, aby nie zmieniać nazw tych składników (szczególnie składników
-publicznych) aby zachować zgodność interfejsu tych klas. Trzymaj się zasady, że
-jeśli nie podano, jak należy dziedziczyć, to zawsze domyślnie dziedziczymy publicznie.
-■ W obu klasach pochodnych utwórz taki wyjątek od dziedziczenia, aby ustawianie
-prędkości nie było dostępne w interfejsach tych klas. Klasy te powinny dawać możliwość zadania prędkości przy tworzeniu instancji, ale dla klasy SamochodCiezarowy
-ograniczenie prędkości maksymalnej powinno wynieść 90 (dla klasy SamochodOsobowy
-ograniczenie powinno być identyczne jak w klasie bazowej.
-Wskazówki: Umieść instrukcję tworzenia wyjątku w sekcji innej niż publiczna.
-W klasie Samochod Osobowy, wystarczy użyć oddziedziczonego setera. W drugiej klasie trzeba w konstruktorze uwzględnić dodatkowe ograniczenie.
-■ Dla całej hierarchii klas: Pojazd i klas pochodnych, utwórz funkcjonalność polimorficzną „opłata rejestracyjna”, której zadaniem będzie wyliczenie kosztu rejestracji danego typu pojazdu według następujących wytycznych:
-- Samochód Osobowy: koszt = 500 + 50 * liczba pasażerów + 5 * nadmiarowa prędkość (nadmiarowa prędkość to każdy km/h prędkości maksymalnej powyżej 140).
-- Samochód Ciężarowy: koszt = 1000 + pojemność + taryfa typu towaru (sypki –
-200, ciekły – 400, paczkowany – 100).
-Nie ma zasad wyliczania kosztu dla samego Pojazdu, więc zdefiniuj wersję metody
-która po prostu zwraca 0.
-Wskazówki: Pamiętaj, że aby metoda działała polimorficznie to w klasie bazowej
-musi mieć odpowiedni specyfikator. Przy redefinicjach metod w klasach pochodnych
-koniecznie stosuj specyfikator override aby upewnić się, że metody te na pewno
-przesłaniają oryginalną metodę z klasy bazowej.
-
-
-
-#pragma once
-#include <cstring>
-#include <cstdio>
-#include <ctype.h>
-#include <cmath>
-#include <iostream>
-
-enum class TypPaczki
-{
-	zwykla,
-	priorytetowa,
-	ekspresowa,
-};
-
-class Paczka
-{
-	double m_waga;
-	double m_wymiary[3];
-	char m_adres[400];
-	TypPaczki m_typ;
-	double nieUjemna(double wart)
-	{
-		return (wart > 0) ? wart : 0;
-	}
-public:
-	void setWaga(double w)
-	{
-		m_waga = nieUjemna(w);
-	}
-	void setWymiary(double w, double sz, double gl)
-	{
-		m_wymiary[0] = nieUjemna(w);
-		m_wymiary[1] = nieUjemna(sz);
-		m_wymiary[2] = nieUjemna(gl);
-	}
-	void setAdres(const char* adr)
-	{
-		strncpy(m_adres, adr, 400);
-	}
-	void setTyp(TypPaczki typ)
-	{
-		m_typ = typ;
-	}
-};
-
-enum class TypNagrody
-{
-	okolicznosciowa,
-	projakościowa,
-	okresowa,
-};
-
-class Osoba;
-
-class Nagroda
-{
-	Osoba* m_beneficjent;
-	Osoba* m_fundator;
-	double m_wysokosc;
-	TypNagrody m_typ;
-	bool m_czyOdebrana;
-public:
-	void setBeneficient(Osoba* ben)
-	{
-		m_beneficjent = ben;
-	}
-	void setFundator(Osoba* fun)
-	{
-		m_fundator = fun;
-	}
-	void setWysokosc(double wys)
-	{
-		m_wysokosc = (wys > 0) ? wys : 0;
-	}
-	void setTyp(TypNagrody typ)
-	{
-		m_typ = typ;
-	}
-	void Odebrano()
-	{
-		m_czyOdebrana = true;
-	}
-};
-
-enum class TypGry 
-{
-	strategiczna,
-	ekonomiczna,
-	przygodowa,
-};
-
-class GraPlanszowa
-{
-protected:
-	char m_tytul[400];
-	int m_liczbaGraczy;
-	int m_czasTrwania;
-	TypGry m_typ;
-	double m_ocenaGraczy;
-	int m_liczbaOcen;
-	double ograniczenie(double wart, double dolne, double gorne)
-	{
-		if (wart > gorne) return gorne;
-		else if (wart < dolne) return dolne;
-		else return wart;
-	}
-public:
-	void setTytul(const char* tyt) { strncpy(m_tytul, tyt, 400); }
-	void setLiczbaGraczy(int lg) { m_liczbaGraczy = (int)ograniczenie(lg, 1, 10); }
-	void setCzasTrwania(int czas) { m_czasTrwania = (int)ograniczenie(czas, 10, 720); }
-	void setTypGry(TypGry typ) { m_typ = typ; }
-	void ocen(double nowaOcena)
-	{
-		nowaOcena = ograniczenie(nowaOcena, 0.0, 5.0);
-		m_ocenaGraczy *= m_liczbaOcen;
-		m_ocenaGraczy += nowaOcena;
-		m_ocenaGraczy /= ++nowaOcena;
-	}
-	//Getery nalyż zdefiniować samodzielnie jeśli okażą sie niebędne do realizacji zadania.
-};
-
-
-
-class Point
-{
-	int m_x, m_y;
-	char m_symbol;
-public:
-	void setX(int x) { m_x = x; }
-	void setY(int y) { m_y = y; }
-	void setSymbol (char sym) 
-	{
-		if (isalpha(sym))
-			m_symbol = sym;
-		else m_symbol = 0;
-	}
-	int getX() { return m_x; }
-	int getY() { return m_y; }
-};
-
-double odleglosc(const Point& A, const Point& B)
-{
-	int dX = A.getX() - B.getX();
-	int dY = A.getY() - b.getY();
-	return sqrt(dX * dX + dY * dY);
-}
-
-enum class TypTowaru { ciekly, sypki, paczkowany };
-enum class KatPJ { A, B, C, D};
-
-
-class SamochodOsobowy
-{
-private:
-	char m_numerRej[9];
-	double m_predkosc;
-	int m_liczbaPasazerow;
-
-	void setPredkosc(double i_pred) { m_predkosc = (i_pred > 160) ? i_pred : 160; }
-	void setLiczbaPasazerow(int i_lp) { m_liczbaPasazerow = (i_lp > 1) ? i_lp : 1; }
-
-public:
-	void setNumerRej(const char* i_num) { strncpy(m_numerRej, i_num, 8); }
-
-	const char* getNumerRej() { return m_numerRej; }
-	double getPredkosc() { return m_predkosc; }
-	int getLiczbaPasazerow() { return m_liczbaPasazerow; }
-
-	SamochodOsobowy(double i_pred, int i_lp, const char* i_num)
-	{
-		setPredkosc(i_pred);
-		setLiczbaPasazerow(i_lp);
-		setNumerRej(i_num);
-	}
-};
-
-class SamochodCiezarowy
-{
-private:
-	double m_predkosc;
-	char m_numerRej[9];
-	double m_pojemnosc;
-	TypTowaru m_typ;
-
-	void setPojemnosc(double i_poj) { m_pojemnosc = (i_poj > 1000) ? i_poj : 1000; }
-	void setPredkosc(double i_pred) { m_predkosc = (i_pred > 160) ? i_pred : 160; }
-
-public:
-	void setTyp(TypTowaru i_typ) { m_typ = i_typ; }
-	void setNumerRej(const char* i_num) { strncpy(m_numerRej, i_num, 8); }
-
-	TypTowaru getTyp() { return m_typ; }
-	const char* getNumerRej() { return m_numerRej; }
-	double getPredkosc() { return m_predkosc; }
-	double getPojemnosc() { return m_pojemnosc; }
-
-	SamochodCiezarowy(double i_pred, double i_poj, TypTowaru i_typ, const char* i_num)
-	{
-		setPredkosc(i_pred);
-		setPojemnosc(i_poj);
-		setNumerRej(i_num);
-		setNumerRej(i_num);
-	}
-};
-
-class Kierowca
-{
-private:
-	int m_staz;
-	KatPJ m_uprawnienie;
-public:
-	void setUprawnienie(KatPJ i_upr) { m_uprawnienie = i_upr; }
-	KatPJ getUprawnienie() { return m_uprawnienie; }
-	int getStaz() { return m_staz; }
-	void zwiekszStaz() { m_staz++; }
-};
-
-class Punkt
-{
-	double m_x = 0.0, m_y = 0.0;
-public:
-	void setXY(double x, double y)
-	{
-		m_x = x;
-		m_y = y;
-	}
-	double getX() const { return m_x; }
-	double getY() const { return m_y; }
-	Punkt(double x, double y)
-		:m_x(x), m_y(y)
-	{}
-};
-
-class Kolo
-{
-	double m_promien = 1.0;
-	Punkt m_srodek;
-public:
-	void setPromien(double r)
-	{
-		m_promien = (r > 0) ? r : 0;
-	}
-	void setSrodek(Punkt p)
-	{
-		m_srodek = p;
-	}
-	double getPromien() const { return m_promien; }
-	Punkt getSrodek() const { return m_srodek; }
-	Kolo(Punkt sr, double r)
-		: m_srodek(sr), m_promien(r)
-	{}
-};
-
-class Kwadrat
-{
-	Punkt m_lewy_dolny, m_prawy_gorny;
-public:
-	void setRogi(Punkt ld, Punkt pg)
-	{
-		m_lewy_dolny = ld;
-		m_prawy_gorny = pg;
-	}
-	Punkt getLewyDolny() const { return m_lewy_dolny; }
-	Punkt getPrawyGorny() const { return m_prawy_gorny; }
-	Kwadrat(Punkt ld, Punkt pg)
-		:m_lewy_dolny(ld), m_prawy_gorny(pg)
-	{}
-};
-
-class Wektor
-{
-	double m_dx = 0.0, m_dy = 0.0;
-public:
-	void setDXY(double dx, double dy)
-	{
-		m_dx = dx;
-		m_dy = dy;
-	}
-	double getDX() const { return m_dx; }
-	double getDY() const { return m_dy; }
-	double dlugosc() const { return sqrt(m_dx*m_dx + m_dy*m_dy); }
-	Wektor(double dx, double dy)
-		:m_dx(dx), m_dy(dy)
-	{}
-};
+Zdefiniuj prostą klasę abstrakcyjną Figura, która zawiać będzie:
+- informacje o położeniu na ekranie (dwie współrzędne typu double).
+- setery i getery położenia.
+- czysto wirtualne metody do wyznaczania pola powierzchni i obwodu figury.
+Wskazówki: Pamiętaj, że jeśli choć jedna metoda klasy jest czysto wirtualna to nie
+ma ona implementacji. Taka klasa z automatu stanie się klasą abstrakcyjną i nie
+będzie zatem można tworzyć samodzielnej instancji tej klasy w programie. Dla metod
+czysto wirtualnych nie definiujemy ciała i musimy ich prototyp oznaczyć w specyficzny sposób. Położenie możesz przechowywać w strukturze.
+■ Zdefiniuj klasy: Koło, Prostokąt i Trójkąt jako klasy pochodne od klasy figura.
+Dodaj do nich minimum potrzebnej informacji koniecznej do wyliczenia dla nich pól
+powierzchni i obwodów.
+Wskazówki: Zastanów się co jest potrzebne, aby dało się policzyć wskazane cechy
+geometryczne tych figur. Staraj się stosować opis najprostszy jak się da, ale pamiętaj, aby wszystkie dane były typów rzeczywistych.
+■ Dla każdej klasy pochodnej zdefiniuj interfejs (setery, getery) oraz konstruktory argumentowe (jawnie wyklucz domyślne).
+Wskazówki: Zwróć uwagę, aby w konstruktorach klas pochodnych (na liście inicjalizacyjnej) zawsze wskazywać który konstruktor klasy bazowej ma być użyty.
+■ Dodaj finalną klasę Kwadrat jako pochodną od Prostokąta. Korzystając z wyjątków
+od typu dziedziczenia i/lub dziedziczenia niepublicznego, tak odziedzicz interfejs
+klasy bazowej, aby w klasie pochodnej nie było zbędnych metod.
+Wskazówki: Zauważ, że kwadrat jest szczególnym typem prostokąta, ale do jego opisu
+potrzeba mniej informacji. Jeśli zatem do ustawienia parametrów geometrycznych
+prostokąta potrzebne były setery i etery obu boków, tak w kwadracie wystarczą tylko te jednego boku. To jest ważne, aby nie dało się dla kwadratu ustawiać danych,
+których on nie używa, a które dostaliśmy mimowolnie z klasy bazowej.
+■ Dla każdej z klas pochodnych zdefiniuj właściwe wersje metod obliczających pola
+powierzchni i obwody.
+Wskazówki: Koniecznie pamiętaj o specyfikatorze override, aby upewnić się, że zdefiniowane metody na pewno przeciążaj metodę wirtualną.
+Opracowanie: dr inż. Łukasz Maliński i mgr inż. Błażej Nycz, Politechnika Śląska, 2024
+■ Dla całej hierarchii klas dodaj funkcjonalność zliczania i odczytywania, ile
+jest wszystkich figur w programie. Zadbaj, aby żadna figura nie była liczona więcej niż jeden raz.
+Wskazówki: To jest w zasadzie powtórzenie materiału z poprzedniego tematu. Ważne
+jest by się zastanowić, w których konstruktorach i destruktorach należy umieścić
+inkrementacje i dekrementacje licznika. Tak, potrzebny jest tylko jeden licznik,
+gdyż interesuje nas liczba wszystkich figur bez podziału na ich typy szczegółowe.
+Pamiętaj, że każda klasa pochodna od klasy Figura, jest figurą.
+■ Napisz krótki program, w którym zdefiniuj taką tablicę 10 elementów, aby dało
+się w niej przechować dowolny typ pochodny od Figury. Poprzepisuj do niej instancje różnych figur geometrycznych o rożnych parametrach. Na koniec policz sumaryczne pole wszystkich figur zebranych w tej tablicy.
